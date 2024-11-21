@@ -29,7 +29,7 @@ def set_seaborn_style(font_family, background_color, grid_color, text_color):
 
 # Clase Producto para manejar cada producto
 class Producto:
-    def init(self, nombre, datos):
+    def __init__(self, nombre, datos):
         self.nombre = nombre
         self.datos = datos
 
@@ -39,10 +39,15 @@ class Producto:
         margen_promedio = (self.datos['Ingreso_total'].sum() - self.datos['Costo_total'].sum()) / self.datos['Ingreso_total'].sum() * 100
         unidades_totales = self.datos['Unidades_vendidas'].sum()
 
-        # Porcentajes de cambio simulados (puedes reemplazarlos por cálculos reales)
-        delta_precio = np.random.uniform(-5, 10)  # Simulación
-        delta_margen = np.random.uniform(-5, 5)  # Simulación
-        delta_unidades = np.random.uniform(-5, 10)  # Simulación
+        # Cálculo de variaciones reales
+        precio_anterior = self.datos['Ingreso_total'].iloc[:-1].sum() / self.datos['Unidades_vendidas'].iloc[:-1].sum()
+        delta_precio = ((precio_promedio - precio_anterior) / precio_anterior) * 100 if precio_anterior else 0
+
+        margen_anterior = (self.datos['Ingreso_total'].iloc[:-1].sum() - self.datos['Costo_total'].iloc[:-1].sum()) / self.datos['Ingreso_total'].iloc[:-1].sum() * 100
+        delta_margen = ((margen_promedio - margen_anterior) / margen_anterior) * 100 if margen_anterior else 0
+
+        unidades_anterior = self.datos['Unidades_vendidas'].iloc[:-1].sum()
+        delta_unidades = ((unidades_totales - unidades_anterior) / unidades_anterior) * 100 if unidades_anterior else 0
 
         # Conversión de fecha
         df_fecha = pd.DataFrame({'year': self.datos['Año'], 'month': self.datos['Mes'], 'day': 1})
@@ -110,6 +115,6 @@ def main():
         prod = Producto(producto, datos_producto)
         prod.tarjeta()
 
-if __name__ == "main":
+if __name__ == "__main__":
     st.set_page_config(page_title="Dashboard de Ventas", layout="wide")
     main()
